@@ -5,7 +5,6 @@ MAX = 501
 win = 0
 draw = 0
 defeat = 0
-result_of_dice_roll = [0]*MAX
 result_dice_a_table = [0]*MAX
 result_dice_b_table = [0]*MAX
 
@@ -42,12 +41,13 @@ def calNumberOfCase(result_dice_a_table, result_dice_b_table):
 
     return tmp_win, tmp_draw, tmp_defeat
 
-def rollDice(dice,number_of_roll):
+def rollDice(dice_index,number_of_roll, dice):
+    global result_arr
 
     if number_of_roll == 0:
         result_arr = []
 
-    if number_of_roll == len(dice):
+    if number_of_roll == len(dice_index):
 
         result = sum(result_arr)
         result_of_dice_roll[result] += 1
@@ -55,18 +55,19 @@ def rollDice(dice,number_of_roll):
         return True
         
 
-    for num in dice[number_of_roll]:
+    for num in dice[dice_index[number_of_roll]]:
 
         result_arr.append(num)
-        rollDice(dice, number_of_roll + 1, result_arr)
+        rollDice(dice_index, number_of_roll + 1, dice)
         result_arr.pop()
 
-def calWinningRate(pick_dice, number_of_dice):
+def calWinningRate(pick_dice, number_of_dice, dice):
 
     
     all_dice_index = list(range(number_of_dice))
     win_rate = {"denominator": 1, "numerator": 0}
     result = ()
+    global result_of_dice_roll
 
     for dice_a in pick_dice:
         dice_b = tuple([value for value in all_dice_index if value not in dice_a])
@@ -74,27 +75,29 @@ def calWinningRate(pick_dice, number_of_dice):
         number_of_roll = 0
         result_of_dice_roll = [0]*MAX
 
-        rollDice(dice_a, number_of_roll)
+        rollDice(dice_a, number_of_roll, dice)
         result_dice_a_table = result_of_dice_roll
 
-        del result_of_dice_roll
         result_of_dice_roll = [0] * MAX
         number_of_roll = 0
 
-        rollDice(dice_b, number_of_roll)
+        rollDice(dice_b, number_of_roll, dice)
         result_dice_b_table = result_of_dice_roll
 
         win, draw, defeat = calNumberOfCase(result_dice_a_table, result_dice_b_table)
-        greatest_common_divisor = gcd(win_rate["denominator"], draw + defeat)
 
-        lcm = win_rate["denominator"] * (draw+defeat) // greatest_common_divisor
+        greatest_common_divisor = gcd(win_rate["denominator"], win + draw + defeat)
 
-        if win_rate["numerator"] * (lcm // win_rate["denominator"]) < win * (lcm // draw+defeat):
-            win_rate["numerator"] = win
-            win_rate["denominator"] = draw+defeat
+        lcm = win_rate["denominator"] * (win + draw + defeat) // greatest_common_divisor
 
-            result = dice_a + 1
-             
+        if win_rate["numerator"] * (lcm // win_rate["denominator"]) < win * (lcm //(win + draw + defeat)):
+
+            greatest_common_divisor = gcd(win, win + draw + defeat)
+
+            win_rate["numerator"] = win // greatest_common_divisor
+            win_rate["denominator"] = (draw + defeat + win) // greatest_common_divisor
+
+            result = dice_a
 
     return result
 
@@ -104,9 +107,12 @@ def simulate(dice):
 
     number_of_dice = len(dice)
     pick_dice = itertools.combinations(range(number_of_dice), number_of_dice//2)
+    
+    result = list(calWinningRate(pick_dice, number_of_dice, dice))
+    for i in range(len(result)):
+        result[i] += 1
 
-    calWinningRate(pick_dice, number_of_dice)
+    return result
 
 
-
-simulate([[1, 2, 3, 4, 5, 6], [3, 3, 3, 3, 4, 4], [1, 3, 3, 4, 4, 4], [1, 1, 4, 4, 5, 5]])
+print(simulate([[1, 2, 3, 4, 5, 6], [3, 3, 3, 3, 4, 4], [1, 3, 3, 4, 4, 4], [1, 1, 4, 4, 5, 5]]))
