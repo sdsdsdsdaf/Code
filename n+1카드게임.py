@@ -15,7 +15,7 @@ def solution(coin, cards):
 
 def get2Card(tmp, card_batch):
     for _ in range(2):
-        if not card_batch:
+        if  card_batch:
             tmp.add(card_batch.popleft())
 
 def simulate(coin, cards):
@@ -25,9 +25,10 @@ def simulate(coin, cards):
     card_batch = deque(cards[n//3:])
     tmp = set()
 
+
+    get2Card(tmp, card_batch)
     while True:
         is_be = False
-        get2Card(tmp, card_batch)
 
         for x in list(handle):
             if n+1-x in handle:
@@ -35,25 +36,28 @@ def simulate(coin, cards):
                 handle.remove(x)
                 handle.remove(n+1-x)
                 round_num += 1
+                get2Card(tmp, card_batch)
                 is_be = True
             
-            elif not(n+1 == sum(tmp)): #1장만으로 가능함
-                if n+1-x in (tmp | handle) and coin > 0:
-                    
-                    handle.remove(x)
-                    tmp.remove(n+1-x) #굳이 하지 않아도 상관은 없음
-                    coin -= 1
-                    round_num += 1
-                    is_be = True
-            else:
-                if n+1 == sum(tmp):
-                    coin -= 2
-                    round_num += 1
-                    is_be = True
+        for x in list(handle): #1개만 있는 경우
+            if n+1-x in tmp:
+                handle.remove(x)
+                tmp.remove(n+1-x)
+                round_num += 1
+                coin -= 1
+                get2Card(tmp, card_batch)
+                is_be = True
 
-        
+        for x in list(tmp):
+
+            if n+1-x in tmp and coin >= 2:
                 
-            
+                tmp.remove(x)
+                tmp.remove(n+1-x)
+                round_num += 1
+                coin -= 2
+                get2Card(tmp, card_batch)
+                is_be = True     
 
         if not card_batch or not is_be:
             break
@@ -61,4 +65,4 @@ def simulate(coin, cards):
 
     return round_num
 
-solution(4,	[3, 6, 7, 2, 1, 10, 5, 9, 8, 12, 11, 4])
+print(solution(10,	[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]))
