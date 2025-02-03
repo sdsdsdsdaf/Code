@@ -38,12 +38,11 @@ def simulate(coin, cards):
     while True:
         is_be = False
         round_num += 1
-        is_end = checkEmpty(card_batch)
         
-        get2Card(tmp, card_batch)
-
-        if is_end:
+        if checkEmpty(card_batch): #카드를 가져오기 전에 카드 뭉치가 비었는지 확인 -> 더 가져올 카드가 없으면 게임 종료료
             break
+
+        get2Card(tmp, card_batch)
 
         for x in list(handle):
             if n+1 - x in handle:
