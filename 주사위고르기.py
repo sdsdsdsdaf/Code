@@ -23,23 +23,19 @@ def gcd(a, b):
     return a
 
 def calNumberOfCase(result_dice_a_table, result_dice_b_table):
-    tmp_win = 0
-    tmp_draw = 0
-    tmp_defeat = 0
+    win = 0
+    draw = 0
+    defeat = 0
     
     for i in range(MAX):
         if result_dice_a_table[i] == 0:
             continue
 
-        for j in range(MAX):
-            if i < j:
-                tmp_defeat += result_dice_a_table[i] * result_dice_b_table[j]
-            elif i == j:
-                tmp_draw += result_dice_a_table[i] * result_dice_b_table[j]
-            else:
-                tmp_win += result_dice_a_table[i] * result_dice_b_table[j]
-
-    return tmp_win, tmp_draw, tmp_defeat
+        win = result_dice_a_table[i] * sum(result_dice_b_table[0:i])
+        draw = result_dice_a_table[i] * result_dice_b_table [i]
+        defeat = result_dice_a_table[i] * sum(result_dice_b_table[i+1 : MAX])
+        
+    return win, draw, defeat
 
 def rollDice(dice_index,number_of_roll, dice):
     global result_arr
