@@ -31,9 +31,9 @@ def calNumberOfCase(result_dice_a_table, result_dice_b_table):
         if result_dice_a_table[i] == 0:
             continue
 
-        win = result_dice_a_table[i] * sum(result_dice_b_table[0:i])
-        draw = result_dice_a_table[i] * result_dice_b_table [i]
-        defeat = result_dice_a_table[i] * sum(result_dice_b_table[i+1 : MAX])
+        win += result_dice_a_table[i] * sum(result_dice_b_table[0:i])
+        draw += result_dice_a_table[i] * result_dice_b_table [i]
+        defeat += result_dice_a_table[i] * sum(result_dice_b_table[i+1 : MAX])
         
     return win, draw, defeat
 

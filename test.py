@@ -1,33 +1,70 @@
 from collections import deque
 
-def check(deck1, deck2, target):
-    operand = set(deck2)
-    for card in deck1:
-        if target - card in operand:
-            deck1.remove(card)
-            deck2.remove(target-card)
-            return True
-    return False
-
 def solution(coin, cards):
-    hand = cards[:len(cards) // 3]
-    deck = deque(cards[len(cards) // 3:])
-    pending = []
-    turn = 1
-    while coin >= 0 and deck:
-        pending.append(deck.popleft())
-        pending.append(deck.popleft())
-        
-        if check(hand, hand, len(cards) + 1):
-            pass
-        elif coin >= 1 and check(hand, pending, len(cards) + 1):
-            coin -= 1
-        elif coin >= 2 and check(pending, pending, len(cards) + 1):
-            coin -= 2
-        else:
+    answer = simulate(coin,  cards)
+    return answer
+
+def checkEmpty(card_batch):
+    return not card_batch
+
+def getCards(draw, card_batch , n =2):
+
+    for _ in range(n):
+        if not checkEmpty(card_batch):
+            draw.add(card_batch.popleft())
+    
+
+def simulate(coin , cards):
+    n = max(cards)
+    mine = set(cards[:len(cards)//3])
+    draw = set()
+    card_batch = deque(cards[len(cards)//3:])
+    is_be = False
+    round_num = 0
+
+    while True:
+        round_num += 1
+        is_be = False
+
+        if checkEmpty(card_batch):
             break
-        turn += 1
-    return turn
+        getCards(draw, card_batch)
+
+        for x in list(mine): #코인을 한개도 소모하지 않는 경우
+            if n+1-x in mine:
+                is_be = True
+
+                mine.remove(x)
+                mine.remove(n+1-x)
+                break
+
+        if is_be:
+            continue
+
+        for x in list(mine):
+            if n+1-x in draw and coin >= 1:
+                is_be = True
+                coin -= 1
+
+                mine.remove(x)
+                draw.remove(n+1-x)
+                break
+        if is_be:
+            continue
+
+        for x in list(draw):
+            if n+1-x in draw and coin >= 2:
+                is_be = True
+                coin -= 2
+
+                draw.remove(x)
+                draw.remove(n+1-x)
+                break
 
 
-print(solution(2, [1,2,3,4,5,6]))
+        if not is_be:
+            break
+
+    return round_num
+
+solution(	2, [5, 8, 1, 2, 9, 4, 12, 11, 3, 10, 6, 7])
